@@ -16,9 +16,31 @@ The orchestrator also invokes guardrails, a Guardian monitor, token/provider man
 
 ## Functional flow
 
-The diagram is a self-contained SVG, so it renders both in GitHub and when opened directly:
+```mermaid
+flowchart TD
+    Trigger[APScheduler or Telegram command] --> Orchestrator[Pipeline Orchestrator]
+    Orchestrator --> Research[News Researcher]
+    Research --> Review1[Automated review and guardrails]
+    Review1 --> Approval1[Telegram approval]
+    Approval1 --> Create[Content Creator]
+    Create --> Review2[Automated review and guardrails]
+    Review2 --> Approval2[Telegram approval]
+    Approval2 --> Validate[Content Validator]
+    Validate --> Review3[Automated review and guardrails]
+    Review3 --> Approval3[Telegram approval]
+    Approval3 --> Publish[Publisher]
+    Publish --> Platforms[Instagram, LinkedIn, and X]
+    Publish --> Report[Telegram delivery report]
 
-[![Hermes Social Agent functional flow](docs/hermes-functional-flow.svg)](docs/hermes-functional-flow.svg)
+    Search[Web search] --> Research
+    LLM[LLM manager and token budget] --> Research
+    LLM --> Create
+    LLM --> Validate
+    Guardian[Guardian monitor] -. observes .-> Research
+    Guardian -. observes .-> Create
+    Guardian -. observes .-> Validate
+    Guardian -. observes .-> Publish
+```
 
 ## What is included
 
