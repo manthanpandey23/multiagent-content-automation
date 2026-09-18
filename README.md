@@ -14,7 +14,11 @@ APScheduler / Telegram command
 
 The orchestrator also invokes guardrails, a Guardian monitor, token/provider management, database persistence, and optional evaluation reporting.
 
-![Functional flow](docs/hermes-functional-flow.svg)
+## Functional flow
+
+The diagram is a self-contained SVG, so it renders both in GitHub and when opened directly:
+
+[![Hermes Social Agent functional flow](docs/hermes-functional-flow.svg)](docs/hermes-functional-flow.svg)
 
 ## What is included
 
