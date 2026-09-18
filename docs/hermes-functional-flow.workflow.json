@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Hermes Social Agent — Functional Flow",
+    "quality_profile": "showcase",
+    "viewBox": [1120, 1320]
+  },
+  "lanes": [
+    { "id": "trigger", "label": "Trigger & Control" },
+    { "id": "agents", "label": "Agent Pipeline" },
+    { "id": "quality", "label": "Quality & Human Control", "variant": "exception" },
+    { "id": "delivery", "label": "Delivery & Observability" }
+  ],
+  "phases": [
+    { "id": "start", "label": "Scheduled intake", "fromCol": 0, "toCol": 1 },
+    { "id": "compose", "label": "Research & compose", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "approve", "label": "Validate & approve", "fromCol": 4, "toCol": 4, "variant": "security" },
+    { "id": "publish", "label": "Publish & report", "fromCol": 5, "toCol": 5, "variant": "dashed" }
+  ],
+  "groups": [
+    { "id": "orchestration", "label": "pipeline.py orchestrates state, agent dispatch, and routing", "lane": "trigger", "fromCol": 1, "toCol": 5, "variant": "emphasis" },
+    { "id": "reviewloop", "label": "Guardrails + automated review", "lane": "quality", "fromCol": 2, "toCol": 4, "variant": "security" },
+    { "id": "outputs", "label": "External integrations", "lane": "delivery", "fromCol": 0, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["schedule", "orchestrator", "research", "review", "create", "validate", "approval", "publish", "social"],
+  "nodes": [
+    { "id": "schedule", "lane": "trigger", "col": 0, "type": "cloud", "label": "APScheduler", "sublabel": "daily research / publish jobs", "width": 140 },
+    { "id": "orchestrator", "lane": "trigger", "col": 1, "type": "backend", "label": "Pipeline Orchestrator", "sublabel": "session state + dispatch", "width": 150 },
+    { "id": "research", "lane": "agents", "col": 1, "type": "backend", "label": "Researcher", "sublabel": "collects technology news", "width": 140 },
+    { "id": "create", "lane": "agents", "col": 3, "type": "backend", "label": "Content Creator", "sublabel": "platform post variants", "width": 140 },
+    { "id": "validate", "lane": "agents", "col": 4, "type": "backend", "label": "Content Validator", "sublabel": "fact checks + refines", "width": 140 },
+    { "id": "review", "lane": "quality", "col": 2, "type": "security", "label": "Reviewer + Guardrails", "sublabel": "score, flags, quality gate", "width": 156 },
+    { "id": "approval", "lane": "quality", "col": 4, "type": "security", "label": "Telegram Review", "sublabel": "approve, reject, or edit", "width": 148 },
+    { "id": "publish", "lane": "agents", "col": 5, "type": "backend", "label": "Publisher", "sublabel": "retries per platform", "width": 140 },
+    { "id": "news", "lane": "delivery", "col": 0, "type": "external", "label": "Web Search", "sublabel": "news sources", "width": 130 },
+    { "id": "models", "lane": "delivery", "col": 2, "type": "cloud", "label": "LLM Manager", "sublabel": "provider routing + token budget", "width": 156 },
+    { "id": "social", "lane": "delivery", "col": 5, "type": "external", "label": "Social Platforms", "sublabel": "Instagram, LinkedIn, X", "width": 150 },
+    { "id": "report", "lane": "delivery", "col": 5, "type": "messagebus", "label": "Telegram Report", "sublabel": "publish outcomes + alerts", "width": 150, "yOffset": 84 }
+  ],
+  "edges": [
+    { "id": "schedule-orchestrator", "from": "schedule", "to": "orchestrator", "label": "triggers", "role": "main" },
+    { "id": "orchestrator-research", "from": "orchestrator", "to": "research", "label": "runs research", "role": "main" },
+    { "id": "news-research", "from": "news", "to": "research", "label": "fetches sources", "role": "branch" },
+    { "id": "research-review", "from": "research", "to": "review", "label": "candidate news", "role": "main", "variant": "security" },
+    { "id": "review-create", "from": "review", "to": "create", "label": "passes gate", "role": "main", "variant": "emphasis" },
+    { "id": "create-validate", "from": "create", "to": "validate", "label": "draft content", "role": "main" },
+    { "id": "validate-approval", "from": "validate", "to": "approval", "label": "validated draft", "role": "main", "variant": "security" },
+    { "id": "approval-publish", "from": "approval", "to": "publish", "label": "approved", "role": "main", "variant": "emphasis" },
+    { "id": "publish-social", "from": "publish", "to": "social", "label": "posts", "role": "main" },
+    { "id": "publish-report", "from": "publish", "to": "report", "label": "results", "role": "async", "variant": "dashed" },
+    { "id": "models-create", "from": "models", "to": "create", "label": "LLM calls", "role": "branch", "variant": "dashed" },
+    { "id": "models-publish", "from": "models", "to": "publish", "label": "LLM calls", "role": "branch", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Control plane", "items": ["Scheduler launches the pipeline", "The orchestrator carries session state between stages"] },
+    { "dot": "rose", "title": "Release gate", "items": ["Guardrails and reviewer assess outputs", "Telegram approval precedes publishing"] }
+  ]
+}
